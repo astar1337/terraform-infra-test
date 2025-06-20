@@ -22,9 +22,6 @@ variable "instance_type" {
   type        = string
   default     = "t2.micro"
 }
-variable "key_name" {
-  
-}
 variable "instance_name" {
   description = "Name tag for the EC2 instance"
   type        = string

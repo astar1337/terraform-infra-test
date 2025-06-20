@@ -35,9 +35,35 @@ resource "aws_instance" "web_servers" {
   count         = 1
   ami           = data.aws_ami.amazon_linux.id
   instance_type = var.instance_type
- 
+  subnet_id     = aws_subnet.public.id
+
   
   tags = {
     Name = "${var.instance_name}-${count.index + 1}"
+  }
+  
+}
+resource "aws_security_group" "web_sg" {
+  name_prefix = "web-server-"
+  vpc_id      = aws_vpc.main.id
+
+  # Allow SSH for EC2 Instance Connect
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "web-server-sg"
   }
 }
