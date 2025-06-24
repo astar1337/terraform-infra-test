@@ -65,5 +65,9 @@ resource "aws_security_group" "web_sg" {
 
   tags = {
     Name = "web-server-sg"
-  }
+  } 
+}
+variable "key_pair_name" {
+  description = "Name of the AWS key pair for SSH access"
+  type        = string
 }

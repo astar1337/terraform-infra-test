@@ -16,4 +16,12 @@ output "instance_public_ip" {
   description = "Public IP address of the EC2 instance"
   value       = aws_instance.web_servers
 }
-
+variable "ami_id" {
+  description = "AMI ID for the EC2 instance"
+  type        = string
+  
+  validation {
+    condition = can(regex("^ami-[a-f0-9]{8}([a-f0-9]{9})?$", var.ami_id))
+    error_message = "AMI ID must be a valid format starting with 'ami-' followed by 8 or 17 hexadecimal characters."
+  }
+}
