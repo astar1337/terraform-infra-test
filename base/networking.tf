@@ -71,3 +71,52 @@ variable "key_pair_name" {
   description = "Name of the AWS key pair for SSH access"
   type        = string
 }
+# A more robust S3 bucket configuration
+resource "aws_s3_bucket" "app_storage" {
+  bucket = "my-app-storage-${random_string.bucket_suffix.result}"
+  
+  # This ensures the bucket can be destroyed even if it contains objects
+  # Use carefully - this is like having a master key that can delete everything
+  force_destroy = false
+}
+
+# Generate a random suffix to ensure bucket name uniqueness
+# This solves the problem that S3 bucket names must be globally unique
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = true
+  upper   = false
+}
+
+# Block all public access - this is your security fortress wall
+resource "aws_s3_bucket_public_access_block" "app_storage_pab" {
+  bucket = aws_s3_bucket.app_storage.id
+
+  # These four settings work together to prevent accidental public exposure
+  block_public_acls       = true  # Blocks new public ACLs from being applied
+  block_public_policy     = true  # Blocks new public policies from being applied
+  ignore_public_acls      = true  # Ignores existing public ACLs
+  restrict_public_buckets = true  # Restricts public bucket policies
+}
+
+# Enable versioning - like having automatic backup copies of every file change
+resource "aws_s3_bucket_versioning" "app_storage_versioning" {
+  bucket = aws_s3_bucket.app_storage.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Configure server-side encryption - your data gets locked with a key
+resource "aws_s3_bucket_server_side_encryption_configuration" "app_storage_encryption" {
+  bucket = aws_s3_bucket.app_storage.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      # AES256 is AWS-managed encryption, KMS gives you more control
+      sse_algorithm = "AES256"
+    }
+    # This ensures that unencrypted uploads are rejected
+    bucket_key_enabled = true
+  }
+}
