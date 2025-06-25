@@ -71,7 +71,7 @@ variable "key_pair_name" {
   description = "Name of the AWS key pair for SSH access"
   type        = string
 }
-# A more robust S3 bucket configuration
+# S3 bucket configuration
 resource "aws_s3_bucket" "app_storage" {
   bucket = "my-app-storage-${random_string.bucket_suffix.result}"
   
@@ -83,7 +83,7 @@ resource "aws_s3_bucket" "app_storage" {
 # Generate a random suffix to ensure bucket name uniqueness
 # This solves the problem that S3 bucket names must be globally unique
 resource "random_string" "bucket_suffix" {
-  length  = 8
+  length  = 4
   special = false
   upper   = false
 }
