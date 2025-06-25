@@ -84,7 +84,7 @@ resource "aws_s3_bucket" "app_storage" {
 # This solves the problem that S3 bucket names must be globally unique
 resource "random_string" "bucket_suffix" {
   length  = 8
-  special = true
+  special = false
   upper   = false
 }
 
